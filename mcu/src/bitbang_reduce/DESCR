@@ -1,0 +1,82 @@
+Bytecode to reduce code size for typical IO registers banging.
+
+
+Usage example:
+
+uint32_t execute(uint8_t * pointer_to_bytecode);
+
+Bytecode is executed, last read made by it is returned.
+
+
+Overall structure of one operation:
+
+OPCODE[1 byte], {ADDRESS[2 bytes]}, {ARGUMENT[1/2/4 bytes]}, {ARGUMENT[1/2/4 bytes}
+
+Peripheral registers are always accessed as 32-bit words.
+
+Address part is tailored to address all peripheral spaces of stm32f030,
+specifically 0x4000_xxxx, 0x4001_xxxx, 0x4002_xxxx and 0x4800_xxxx ranges.
+
+Address part is optional, if it is absent, previous address is reused.
+
+Argument is a value to be operated over the contents of the register. There are
+three ways to represent argument. First is arbitrary 32 bit value stored in 4 bytes.
+
+Second is 13-bit field that is shifted to any position in 32-bit word, other
+bits being 0. Stored in 2 bytes.
+
+Third is similar 6-bit field, stored in 1 byte.
+
+Each opcode can optionally set address. If opcode does not set address, the previously
+set address is reused.
+
+Opcodes have 0, 1 or 2 arguments. In case of 2 arguments, both share position and
+encoding of the bitfield.
+
+Every 2- or 4-byte quantity is stored without alignment in LE byte order.
+
+
+Opcode structure: 8'b OOO_A_MMMM:
+ 
+ OOO encodes one of 8 operations.
+
+ A: when it is 1, address part is present (in all opcodes incl. STOP)
+ 
+ MMMM is the modifier used to select size of the arguments.
+
+
+ OOO | operation | num.args | description
+-----+-----------+----------+-------------------------------------------------------------
+   0 | STOP      |        0 | Finish operation
+   1 | READ      |        0 | Unmasked read
+   2 | WRITE     |        1 | write argument to the whole register
+   3 | BIC       |        1 | BIt Clear: REG = REG & (~argument)
+   4 | BIS       |        1 | BIt Set:   REG = REG |   argument
+   5 | READMASK  |        1 | Masked read: value masked by argument
+   6 | BICS      |        2 | BIt Clear then Set: REG = (REG & (~argument1)) | argument2
+   7 | WAITMASK  |        2 | busy poll until (REG & argument1) == argument2
+
+
+Address encoding:
+
+value is 16'b AAAAaaaaAAAAaa_RR
+
+ RR | address region
+----+----------------
+  0 | 0x4000_0000
+  1 | 0x4001_0000
+  2 | 0x4002_0000
+  3 | 0x4800_0000
+
+Register offset (in bytes) is (AAAAaaaaAAAAaa*4) or (value & 0xFFFC)
+
+
+Modifier+argument encoding: (modifier bits come from the opcode byte)
+
+ MMMM | arg size |               argument | value
+------+----------+------------------------+-------
+ 00?? | 4 bytes  |                (as is) | (as is)
+ 01XX | 2 bytes  | 16'b SSS_fFFFFffffFFFF | F[12:0] << {XX,SSS}
+ 1YYY | 1 byte   |          8'b SS_ffFFFF | F[ 5:0] << {YYY,SS}
+
+
