@@ -1,0 +1,280 @@
+(footprint "KF7.62-2"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(descr "1x2 Close Vertical PCB Header WR-TBL Series 3114 https://www.we-online.com/components/products/datasheet/691311400102.pdf")
+	(tags "Wuerth WR-TBL Series 3114 terminal block pitch 7.62mm")
+	(property "Reference" "REF**"
+		(at 4.5 -7.1 0)
+		(layer "F.SilkS")
+		(uuid "47b0bf73-1512-4fb5-b891-b22f0936f2b1")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "KF7.62-2"
+		(at -3.5 -7.1 0)
+		(layer "F.Fab")
+		(uuid "99557e4a-9323-4a36-be52-6490f417d2be")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "63285070-9b03-4956-9e3b-422468179ed1")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "49d01af9-7c1a-475b-9c00-a4fbb984f189")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(fp_line
+		(start -7.8 -6.2)
+		(end -7.8 -5.2)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "d3349309-d2c4-4458-be79-2382c90af505")
+	)
+	(fp_line
+		(start -7.8 -6.2)
+		(end -6.8 -6.2)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "66962c45-eb80-4463-b83f-c94d4c4b5bb4")
+	)
+	(fp_line
+		(start -7.5 -5.9)
+		(end 7.5 -5.9)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "0dac7354-775c-4419-ae34-1ee1c266498e")
+	)
+	(fp_line
+		(start -7.5 5.9)
+		(end -7.5 -5.9)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "863c14fc-619a-42ee-b61e-8295d01de7c1")
+	)
+	(fp_line
+		(start -2.61 1.4)
+		(end -5.41 -1.4)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "3f926cbc-594d-49db-9485-a23830cf75e1")
+	)
+	(fp_line
+		(start -2.41 1.2)
+		(end -5.21 -1.6)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "919f8342-247f-4047-94ca-e6f4d1bb4656")
+	)
+	(fp_line
+		(start 0 -5.9)
+		(end 0 5.9)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "4658e05a-9773-49fd-8c54-6e1ecb0b1100")
+	)
+	(fp_line
+		(start 5.11 1.5)
+		(end 2.31 -1.3)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "0329d0ed-5c45-40c8-814a-23ce558f4ba5")
+	)
+	(fp_line
+		(start 5.31 1.3)
+		(end 2.51 -1.5)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "16766bc6-5a42-467d-aeba-50bf6e523cfe")
+	)
+	(fp_line
+		(start 7.5 -5.9)
+		(end 7.5 5.9)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "c907436e-ee95-4747-ba7f-58032a8ebedc")
+	)
+	(fp_line
+		(start 7.5 5.9)
+		(end -7.5 5.9)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "650cba07-4552-4114-ba1d-10a2af8187bd")
+	)
+	(fp_circle
+		(center -3.91 -0.1)
+		(end -1.91 -0.1)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "1ae31aa7-ddd9-411e-880d-d722f376a610")
+	)
+	(fp_circle
+		(center 3.81 0)
+		(end 5.81 0)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "4b566efa-4fbf-4707-9a87-e44475267ef0")
+	)
+	(fp_line
+		(start -7.62 -6.05)
+		(end -7.62 6.05)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "df9f7904-f11b-4e87-b681-274a9ea55e30")
+	)
+	(fp_line
+		(start -7.62 -6.05)
+		(end 7.62 -6.05)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "0168805e-812b-42ee-9a25-0ccf69610dd7")
+	)
+	(fp_line
+		(start -7.62 6.05)
+		(end 7.62 6.05)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "f6b6c396-0e96-4508-bc2d-881b10479b04")
+	)
+	(fp_line
+		(start 7.62 6.05)
+		(end 7.62 -6.05)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "04d2542a-2b73-48c4-92b0-92ec63a26147")
+	)
+	(fp_text user "${REFERENCE}"
+		(at -0.3 7.1 0)
+		(layer "F.Fab")
+		(uuid "fe70b5de-0f22-4cfb-b257-eda2846a333d")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" thru_hole rect
+		(at -3.81 3.7)
+		(size 3 3)
+		(drill 1.3)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "8f52c4f1-95e5-4fb8-b987-5558af5b5ddd")
+	)
+	(pad "2" thru_hole circle
+		(at 3.81 3.7)
+		(size 3 3)
+		(drill 1.3)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "29aafdfd-2ac9-4ac3-959d-03b117ed8ad7")
+	)
+	(group ""
+		(uuid "36723344-f2e2-48e9-ae40-51da0238c491")
+		(members "0329d0ed-5c45-40c8-814a-23ce558f4ba5" "16766bc6-5a42-467d-aeba-50bf6e523cfe"
+			"4b566efa-4fbf-4707-9a87-e44475267ef0"
+		)
+	)
+	(group ""
+		(uuid "a171946c-37ab-429e-a59f-9255f867a2f1")
+		(members "1ae31aa7-ddd9-411e-880d-d722f376a610" "3f926cbc-594d-49db-9485-a23830cf75e1"
+			"919f8342-247f-4047-94ca-e6f4d1bb4656"
+		)
+	)
+	(embedded_fonts no)
+	(model "${KICAD9_3DMODEL_DIR}/TerminalBlock_Wuerth.3dshapes/Wuerth_691311400102_P7.62mm.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)
