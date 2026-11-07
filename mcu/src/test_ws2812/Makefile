@@ -40,9 +40,9 @@ include $(targets:%=%.d)
 
 ### Specific rules
 
-ram.elf: $(targets:%=%.o)
-	$(LD) -o$@ $^ $(LDFLAGS) $(LINKRAM)
-	$(SIZE) $@
+#ram.elf: $(targets:%=%.o)
+#	$(LD) -o$@ $^ $(LDFLAGS) $(LINKRAM)
+#	$(SIZE) $@
 
 
 rom.elf: $(targets:%=%.o)

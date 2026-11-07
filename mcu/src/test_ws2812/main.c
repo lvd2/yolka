@@ -1,13 +1,12 @@
 #include <stdint.h>
 #include "hw/stm32f0xx.h"
 
-// PA0 -- key input
-// PA4 -- LED (on when 0)
+// PB6 -- set to 1 (fet gate)
 // PB1 -- gen 3.2MHz clock (TIM14)
 // PA5 -- input of 3.2 MHz for SPI1
 // PA6 -- MISO from SPI1 (to ws2818)
 
-#define USE_XTAL 1
+#define USE_XTAL 0
 #define DO_DMA 1
 #define DO_4BITS 1
 
@@ -111,18 +110,16 @@ void main(void)
 
 
 
-	// PA0 -- input
-	GPIOA->MODER &= ~GPIO_MODER_MODER0; // 00 -- input
-	GPIOA->PUPDR &= ~GPIO_PUPDR_PUPDR0; // no pulls
-
-	// PA4 as output
-	GPIOA->MODER &= ~GPIO_MODER_MODER4_Msk;
-	GPIOA->MODER |= 1UL<<GPIO_MODER_MODER4_Pos; // general purpose output
+	// PB6 as output emitting 1
+	GPIOB->MODER &= ~GPIO_MODER_MODER6_Msk;
+	GPIOB->MODER |= 1UL<<GPIO_MODER_MODER6_Pos; // general purpose output
 	//
-	GPIOA->OTYPER &= ~GPIO_OTYPER_OT_4; // push-pull
+	GPIOB->OTYPER &= ~GPIO_OTYPER_OT_6; // push-pull
 	//
-	GPIOA->OSPEEDR &= ~GPIO_OSPEEDR_OSPEEDR4; // lowest speed
-
+	GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEEDR6_Msk))
+	                 | (2UL<<GPIO_OSPEEDR_OSPEEDR6_Pos); // speed 2
+	//
+	GPIOB->BSRR = GPIO_BSRR_BS_6; // output 1
 
 	// PA5 -- SPI1 SCK (input)
 	// PA6 -- SPI1 MISO (output)
