@@ -6,11 +6,11 @@
 // PA5 -- input of 3.2 MHz for SPI1
 // PA6 -- MISO from SPI1 (to ws2818)
 
-#define USE_XTAL 0
+//#define USE_XTAL 1
 #define DO_DMA 1
 #define DO_4BITS 1
 
-#define NUM_LED (9)
+#define NUM_LED (64)
 #define MAX_VAL (16)
 #define DELAY   (1)
 
@@ -239,7 +239,7 @@ void main(void)
 			regen_leds = 0;
 
 
-			ctr+=4;
+			ctr+=11;
 			if(ctr>=256*3*NUM_LED) ctr=0;
 
 			int i;
