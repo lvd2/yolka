@@ -1,0 +1,16 @@
+simple test for the board.
+
+
+Prerequisites:
+
+ - Set SEL_OUT (JP2) jumper to MISO mode
+
+
+Effect:
+
+Every LED will be set to white mode, R=G=B=1 (lowest brightness).
+
+Then each LED will be cycled through green, red, blue brightness levels,
+going back to R=G=B=1 mode. After 64th LED, cycle will continue from the
+1st LED.
+
