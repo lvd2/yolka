@@ -21,7 +21,7 @@ uint32_t bit_exec(uint8_t * script)
 		opcode = *(script++);
 		mmmm = opcode & OP_MMASK;
 
-		if( opcode & OP_AMASK ); // fetch address
+		if( opcode & OP_AMASK ) // fetch address
 		{
 			uint32_t mkaddr;
 
