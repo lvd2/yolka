@@ -1,21 +1,25 @@
 #!/usr/bin/env python
 
-import os,re,sys,subprocess
+import os,re,sys,subprocess,tempfile
+
+
+OBJDUMP = 'arm-none-eabi-objdump'
+OBJCOPY = 'arm-none-eabi-objcopy'
+LD      = 'arm-none-eabi-ld'
+
 
 def parse_obj(filename):
     # [ ('name1', binary),
     #   ('name2', binary),
     # ... ]
 
-    objdump = 'arm-none-eabi-objdump'
-
     section_prefix = '__io_scripts__'
 
-    args = [objdump, '-s', filename]
+    args = [OBJDUMP, '-s', filename]
     res = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     if res.returncode!=0:
-        print('<{0}> failed with returncode {1}!'.format(objdump, res.returncode))
+        print('<{0}> failed with returncode {1}!'.format(OBJDUMP, res.returncode))
         print('stdout:\n{0}\nstderr:\n{1}'.format(res.stdout,res.stderr))
         sys.exit(1)
 
@@ -249,7 +253,32 @@ def gen_packed(intdata):
         print(ppp)
         print(cmdbytes.hex(' '))
 
+        byteflow += cmdbytes
+
     return byteflow
+
+
+
+def mk_obj(tmpath, name):
+    # make object for binary file 'name' at path 'tmpath'
+
+    objfile = os.path.join(tmpath, name+'.o')
+
+    args  = [OBJCOPY, '-I', 'binary', '-O', 'elf32-littlearm', '-B', 'arm']
+    args += ['--binary-symbol-prefix={}'.format(name), '--redefine-sym', '{}_start={}'.format(name,name)]
+    args += ['--strip-symbol={}_end'.format(name), '--strip-symbol={}_size'.format(name)]
+    args += ['--rename-section', '.data=.rodata,alloc,load,readonly,data,contents']
+    args += ['--set-section-alignment', '.rodata=1']
+    args += [os.path.join(tmpath,name), objfile]
+    #print(args)
+
+    res = subprocess.run(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    if res.returncode!=0:
+        print('<{0}> failed with returncode {1}!'.format(OBJCOPY, res.returncode))
+        sys.exit(1)
+
+    return objfile
 
 
 def main():
@@ -279,14 +308,29 @@ def main():
             print('name <{}> is already in dictionary!'.format(name))
             sys.exit(1)
         sdict[name]=gen_packed(data)
-    print(sdict)
+    #print(sdict)
 
-    for s in sdict.keys():
-        print(s)
-        print(len(sdict[s]))
-        k=sdict[s]
-        for bb in k:
-            print('{}'.format(hex(bb)))
+    # dump every script into binary file and then create object file with that contents
+    with tempfile.TemporaryDirectory(delete=False) as tmpd:
+        #print(tmpd)
+        objs = []
+        for k in sdict.keys():
+            #print(k)
+            with open(os.path.join(tmpd,k),"wb") as binfile:
+                binfile.write(sdict[k])
+            objs += [mk_obj(tmpd,k)]
+
+        # link separate scripts together
+        args = [LD, '-r', '-o', '__io_scripts__.o'] + objs
+        res = subprocess.run(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+        if res.returncode!=0:
+            print('<{0}> failed with returncode {1}!'.format(LD, res.returncode))
+            sys.exit(1)
+
+    
+    sys.exit(0)
+
 
 
 if __name__=="__main__":
