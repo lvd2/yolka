@@ -113,8 +113,51 @@ BEGIN_IO_SCRIPT( clkinit )
 	{OP_STOP}
 END_IO_SCRIPT
 
+BEGIN_IO_SCRIPT(gpio)
+	
+	// PB6 as output emitting 1
+	{OP_BICS, &GPIOB->MODER, GPIO_MODER_MODER6_Msk, 1UL<<GPIO_MODER_MODER6_Pos}, // general purpose output
+	//
+	{OP_BIC, &GPIOB->OTYPER, GPIO_OTYPER_OT_6}, // push-pull
+	//
+	{OP_BICS, &GPIOB->OSPEEDR, GPIO_OSPEEDR_OSPEEDR6_Msk, (2UL<<GPIO_OSPEEDR_OSPEEDR6_Pos)}, // speed 2
+	//
+	{OP_WRITE, &GPIOB->BSRR, GPIO_BSRR_BS_6}, // output 1
+
+	// PA5 -- SPI1 SCK (input)
+	// PA6 -- SPI1 MISO (output)
+	{OP_BICS, &GPIOA->MODER, (GPIO_MODER_MODER5 | GPIO_MODER_MODER6), 
+	                (2UL << GPIO_MODER_MODER5_Pos) |
+	                (2UL << GPIO_MODER_MODER6_Pos) },
+	//
+	{OP_BIC, &GPIOA->OTYPER, GPIO_OTYPER_OT_6}, // push-pull (PA6)
+	//
+	{OP_BICS, &GPIOA->OSPEEDR, (GPIO_OSPEEDR_OSPEEDR5_Msk | GPIO_OSPEEDR_OSPEEDR6_Msk),   // 3rd speed grade
+	                           (2UL << GPIO_OSPEEDR_OSPEEDR6_Pos) },                      //
+	//
+	{OP_BICS, &GPIOA->AFR[0], (GPIO_AFRL_AFRL5_Msk | GPIO_AFRL_AFRL6_Msk), (0UL << GPIO_AFRL_AFRL5_Pos) |  (0UL << GPIO_AFRL_AFRL6_Pos) }, // PA5,6 <- AF0
+
+
+
+	// configure PB1 as output, controlled by TIM14
+	{OP_BICS, &GPIOB->MODER, GPIO_MODER_MODER1_Msk, (2UL << GPIO_MODER_MODER1_Pos) }, // PB1 alternate function
+	//
+	{OP_BIC, &GPIOB->OTYPER, GPIO_OTYPER_OT_1 },
+	//
+	{OP_BICS, &GPIOB->OSPEEDR, GPIO_OSPEEDR_OSPEEDR1_Msk, (2UL << GPIO_OSPEEDR_OSPEEDR1_Pos) },
+	//
+	{OP_BICS, &GPIOB->AFR[0], GPIO_AFRL_AFRL1_Msk, (0UL << GPIO_AFRL_AFRL1_Pos) }, // PB1 <- AF0
+	{OP_STOP}
+
+END_IO_SCRIPT
+
+
+
 void main(void)
 {
+
+	bit_exec(clkinit);
+#if 0
 	// enable clocks: GPIOA, GPIOB, DMA
 	RCC->AHBENR |= RCC_AHBENR_GPIOAEN | RCC_AHBENR_GPIOBEN | RCC_AHBENR_DMAEN;
 
@@ -184,9 +227,11 @@ void main(void)
 	RCC->CFGR = (RCC->CFGR & (~(RCC_CFGR_SW_Msk))) | RCC_CFGR_SW_PLL;
 	// wait for switch
 	while( (RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL );
+#endif
+	
 
-
-
+	bit_exec(gpio);
+#if 0
 	// PB6 as output emitting 1
 	GPIOB->MODER &= ~GPIO_MODER_MODER6_Msk;
 	GPIOB->MODER |= 1UL<<GPIO_MODER_MODER6_Pos; // general purpose output
@@ -221,7 +266,7 @@ void main(void)
 	GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEEDR1_Msk)) | (2UL << GPIO_OSPEEDR_OSPEEDR1_Pos);
 	//
 	GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFRL1_Msk)) | (0UL << GPIO_AFRL_AFRL1_Pos); // PB1 <- AF0
-
+#endif
 
 
 	// configure TIMER14 (running at APB @ 48 MHz):
