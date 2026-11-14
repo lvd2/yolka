@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os,re,sys,subprocess,tempfile
 
@@ -264,23 +264,24 @@ def gen_packed(intdata):
 def mk_obj(tmpath, name):
     # make object for binary file 'name' at path 'tmpath'
 
-    objfile = os.path.join(tmpath, name+'.o')
+    objfile = name+'.o'
 
     args  = [OBJCOPY, '-I', 'binary', '-O', 'elf32-littlearm', '-B', 'arm']
-    args += ['--binary-symbol-prefix={}'.format(name), '--redefine-sym', '{}_start={}'.format(name,name)]
-    args += ['--strip-symbol={}_end'.format(name), '--strip-symbol={}_size'.format(name)]
+#    args += ['--binary-symbol-prefix={}'.format(name)]
+    args += ['--redefine-sym', '_binary_{}_start={}'.format(name,name)]
+    args += ['--strip-symbol=_binary_{}_end'.format(name), '--strip-symbol=_binary_{}_size'.format(name)]
     args += ['--rename-section', '.data=.rodata,alloc,load,readonly,data,contents']
     args += ['--set-section-alignment', '.rodata=1']
-    args += [os.path.join(tmpath,name), objfile]
-    #print(args)
+    args += [name, objfile]
+    print(' '.join(args))
 
-    res = subprocess.run(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    res = subprocess.run(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, cwd=tmpath)
 
     if res.returncode!=0:
         print('<{0}> failed with returncode {1}!'.format(OBJCOPY, res.returncode))
         sys.exit(1)
 
-    return objfile
+    return os.path.join(tmpath,objfile)
 
 
 def main():
@@ -323,6 +324,7 @@ def main():
 
         # link separate scripts together
         args = [LD, '-r', '-o', '__io_scripts__.o'] + objs
+        print(' '.join(args))
         res = subprocess.run(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         if res.returncode!=0:
