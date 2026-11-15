@@ -28,7 +28,8 @@ volatile uint32_t   send_ctr;
 volatile uint16_t   send_arr[ 3 + ((3*4*NUM_LED)+1)/2 ];
 volatile uint16_t * send_ptr;
 
-	const uint32_t mapmul = 4;
+static const uint32_t mapmul = 4;
+
 
 void init_leds(void);
 
@@ -104,9 +105,9 @@ void main(void)
 
 
 
-	const struct gpio_cfg tim14_pin = 
+	const static struct gpio_cfg tim14_pin = 
 	{
-		{
+		.mode = {
 			.mode  = GPIO_MODE_ALT,
 			.otyp  = GPIO_OTYP_PP,
 			.ospd  = GPIO_OSPD_M1,
@@ -115,11 +116,13 @@ void main(void)
 			.count = 1,
 		},
 
-		{
+		.pins = {
 			{.pin = 1, .num = GPIO_B}, // PB1
 		}
 	};
 
+
+	gpio_cfg(&tim14_pin, 0);
 
 
 

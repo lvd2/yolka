@@ -23,7 +23,7 @@
 		RCC_AHB1ENR_GPIOIEN_Pos
 	};
 
-	volatile uint32_t * const clken_reg = &RCC->AHB1ENR;
+	static volatile uint32_t * const clken_reg = &RCC->AHB1ENR;
 
 #elif defined(STM32F030x6)
 
@@ -37,7 +37,7 @@
 		33                    , RCC_AHBENR_GPIOFEN_Pos, // no GPIOE
 	};
 	
-	volatile uint32_t * const clken_reg = &RCC->AHBENR;
+	static volatile uint32_t * const clken_reg = &RCC->AHBENR;
 #else
 	#error MCU type macro not defined!
 #endif
