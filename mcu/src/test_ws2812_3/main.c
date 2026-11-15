@@ -1,10 +1,18 @@
 #include <stdint.h>
 #include "hw/stm32f0xx.h"
 
-// PB6 -- set to 1 (fet gate)
-// PB1 -- gen 3.2MHz clock (TIM14)
-// PA5 -- input of 3.2 MHz for SPI1
-// PA6 -- MISO from SPI1 (to ws2818)
+#include "gpio.h"
+
+// PA5 -- input of 0.8 MHz for SPI1 SCK
+// PA6 -- TIM3_CH1 from MISO, enables count when 0
+// PA7 -- TIM17_CH1 output, positive pulse
+// PA8 -- TIM1_CH1 from MISO, enables count when 1
+// PA9 -- TIM1_CH2 from SCK (0->1 capture)
+//
+// PB0 -- TIM3_CH3 from SCK (0->1 capture)
+// PB1 -- TIM14_CH1 gen 0.8 MHz clock
+// PB4 -- MISO output
+// PB6 -- TIM16_CH1N output, negative pulse
 
 #define NUM_LED (64)
 #define MAX_VAL (16)
@@ -30,24 +38,6 @@ uint32_t rnd(void);
 
 void main(void)
 {
-	// enable clocks: GPIOA, GPIOB, DMA
-	RCC->AHBENR |= RCC_AHBENR_GPIOAEN | RCC_AHBENR_GPIOBEN | RCC_AHBENR_DMAEN;
-
-	// reset GPIOA, GPIOB
-	RCC->AHBRSTR = RCC_AHBRSTR_GPIOARST | RCC_AHBRSTR_GPIOBRST;
-	RCC->AHBRSTR = 0;
-
-	// enable clocks: TIM14, SPI1
-	RCC->APB1ENR |= RCC_APB1ENR_TIM14EN;
-	RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
-
-	// reset: TIM14, SPI1
-	RCC->APB1RSTR = RCC_APB1RSTR_TIM14RST;
-	RCC->APB2RSTR = RCC_APB2RSTR_SPI1RST;
-	RCC->APB1RSTR = 0;
-	RCC->APB2RSTR = 0;
-
-
 	
 	// turn on prefetch and configure 1 flash wait state for 48MHz clock
 	FLASH->ACR = (FLASH->ACR & (~(FLASH_ACR_LATENCY_Msk))) | FLASH_ACR_PRFTBE | (1UL<<FLASH_ACR_LATENCY_Pos);
@@ -90,41 +80,46 @@ void main(void)
 	while( (RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL );
 
 
+	
 
-	// PB6 as output emitting 1
-	GPIOB->MODER &= ~GPIO_MODER_MODER6_Msk;
-	GPIOB->MODER |= 1UL<<GPIO_MODER_MODER6_Pos; // general purpose output
-	//
-	GPIOB->OTYPER &= ~GPIO_OTYPER_OT_6; // push-pull
-	//
-	GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEEDR6_Msk))
-	                 | (2UL<<GPIO_OSPEEDR_OSPEEDR6_Pos); // speed 2
-	//
-	GPIOB->BSRR = GPIO_BSRR_BS_6; // output 1
+	// enable clocks: GPIOA, GPIOB, GPIOF, DMA
+	RCC->AHBENR |= RCC_AHBENR_GPIOAEN | RCC_AHBENR_GPIOBEN |
+	               RCC_AHBENR_GPIOFEN | RCC_AHBENR_DMAEN;
 
-	// PA5 -- SPI1 SCK (input)
-	// PA6 -- SPI1 MISO (output)
-	GPIOA->MODER &= ~ (GPIO_MODER_MODER5 | GPIO_MODER_MODER6);
-	GPIOA->MODER |= (2UL << GPIO_MODER_MODER5_Pos) |
-	                (2UL << GPIO_MODER_MODER6_Pos) ;
-	//
-	GPIOA->OTYPER &= ~GPIO_OTYPER_OT_6; // push-pull (PA6)
-	//
-	GPIOA->OSPEEDR &= ~(GPIO_OSPEEDR_OSPEEDR5_Msk | GPIO_OSPEEDR_OSPEEDR6_Msk);   // 3rd speed grade
-	GPIOA->OSPEEDR |= (2UL << GPIO_OSPEEDR_OSPEEDR6_Pos);                         //
-	//
-	GPIOA->AFR[0] = (GPIOA->AFR[0] & (~(GPIO_AFRL_AFRL5_Msk | GPIO_AFRL_AFRL6_Msk))) | (0UL << GPIO_AFRL_AFRL5_Pos) |  (0UL << GPIO_AFRL_AFRL6_Pos); // PA5,6 <- AF0
+	// reset GPIOA, GPIOB, GPIOF
+	RCC->AHBRSTR = RCC_AHBRSTR_GPIOARST | RCC_AHBRSTR_GPIOBRST |
+	               RCC_AHBRSTR_GPIOFRST ;
+	RCC->AHBRSTR = 0;
+
+	// enable clocks: TIM1, TIM3, TIM14, TIM16, TIM17, SPI1
+	RCC->APB1ENR |= RCC_APB1ENR_TIM3EN  | RCC_APB1ENR_TIM14EN;
+	RCC->APB2ENR |= RCC_APB2ENR_TIM1EN | RCC_APB2ENR_TIM16EN |
+	                RCC_APB2ENR_TIM17EN | RCC_APB2ENR_SPI1EN;
+
+	RCC->APB1RSTR = RCC_APB1RSTR_TIM3RST | RCC_APB1RSTR_TIM14RST;
+	RCC->APB1RSTR = 0;
+	RCC->APB2RSTR = RCC_APB2RSTR_TIM1RST | RCC_APB2RSTR_TIM16RST |
+	                RCC_APB2RSTR_TIM17RST | RCC_APB2RSTR_SPI1RST;
+	RCC->APB2RSTR = 0;
 
 
 
-	// configure PB1 as output, controlled by TIM14
-	GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODER1_Msk)) | (2UL << GPIO_MODER_MODER1_Pos); // PB1 alternate function
-	//
-	GPIOB->OTYPER &= ~( GPIO_OTYPER_OT_1 );
-	//
-	GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDR_OSPEEDR1_Msk)) | (2UL << GPIO_OSPEEDR_OSPEEDR1_Pos);
-	//
-	GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFRL1_Msk)) | (0UL << GPIO_AFRL_AFRL1_Pos); // PB1 <- AF0
+	const struct gpio_cfg tim14_pin = 
+	{
+		{
+			.mode  = GPIO_MODE_ALT,
+			.otyp  = GPIO_OTYP_PP,
+			.ospd  = GPIO_OSPD_M1,
+			.pupd  = GPIO_PUPD_NO,
+			.afnum = 0,
+			.count = 1,
+		},
+
+		{
+			{.pin = 1, .num = GPIO_B}, // PB1
+		}
+	};
+
 
 
 

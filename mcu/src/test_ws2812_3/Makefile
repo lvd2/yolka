@@ -32,7 +32,7 @@ all: rom.bin
 #all: rom.bin ram.bin
 
 ### Source files
-targets = startup main
+targets = startup main gpio
 
 # include dependencies for each target
 include $(targets:%=%.d)
