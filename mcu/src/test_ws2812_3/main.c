@@ -117,12 +117,98 @@ void main(void)
 		},
 
 		.pins = {
-			{.pin = 1, .num = GPIO_B}, // PB1
+			{.pin = 1, .num = GPIO_B}, // PB1 0.8MHz output
 		}
 	};
-
-
 	gpio_cfg(&tim14_pin, 0);
+
+	const static struct gpio_cfg spi_pins =
+	{
+		.mode = {
+			.mode  = GPIO_MODE_ALT,
+			.otyp  = GPIO_OTYP_PP,
+			.ospd  = GPIO_OSPD_M1,
+			.pupd  = GPIO_PUPD_NO,
+			.afnum = 0,
+			.count = 2,
+		},
+
+		.pins = {
+			{.pin = 5, .num = GPIO_A}, // PA5 sck input
+			{.pin = 4, .num = GPIO_B}, // PB4 miso output
+		}
+	};
+	gpio_cfg(&spi_pins, 0);
+
+	const static struct gpio_cfg tim1_pins =
+	{
+		.mode = {
+			.mode  = GPIO_MODE_ALT,
+			.otyp  = GPIO_OTYP_PP,
+			.ospd  = GPIO_OSPD_M1,
+			.pupd  = GPIO_PUPD_NO,
+			.afnum = 2,
+			.count = 2,
+		},
+
+		.pins = {
+			{.pin = 8, .num = GPIO_A}, // PA8
+			{.pin = 9, .num = GPIO_A}, // PA9
+		}
+	};
+	gpio_cfg(&tim1_pins, 0);
+
+	const static struct gpio_cfg tim3_pins =
+	{
+		.mode = {
+			.mode  = GPIO_MODE_ALT,
+			.otyp  = GPIO_OTYP_PP,
+			.ospd  = GPIO_OSPD_M1,
+			.pupd  = GPIO_PUPD_NO,
+			.afnum = 1,
+			.count = 2,
+		},
+
+		.pins = {
+			{.pin = 6, .num = GPIO_A}, // PA6
+			{.pin = 0, .num = GPIO_B}, // PB0
+		}
+	};
+	gpio_cfg(&tim3_pins, 0);
+
+	const static struct gpio_cfg tim16_pin =
+	{
+		.mode = {
+			.mode  = GPIO_MODE_ALT,
+			.otyp  = GPIO_OTYP_PP,
+			.ospd  = GPIO_OSPD_M1,
+			.pupd  = GPIO_PUPD_NO,
+			.afnum = 2,
+			.count = 1,
+		},
+
+		.pins = {
+			{.pin = 6, .num = GPIO_B}, // PB6
+		}
+	};
+	gpio_cfg(&tim16_pin, 0);
+
+	const static struct gpio_cfg tim17_pin =
+	{
+		.mode = {
+			.mode  = GPIO_MODE_ALT,
+			.otyp  = GPIO_OTYP_PP,
+			.ospd  = GPIO_OSPD_M1,
+			.pupd  = GPIO_PUPD_NO,
+			.afnum = 5,
+			.count = 1,
+		},
+
+		.pins = {
+			{.pin = 7, .num = GPIO_A}, // PA7
+		}
+	};
+	gpio_cfg(&tim17_pin, 0);
 
 
 
@@ -133,7 +219,7 @@ void main(void)
 	TIM14->CCR1 = TIM14->ARR>>1;
 	TIM14->CNT  = 0;
 	//
-	TIM14->CCMR1 = (0x7UL << TIM_CCMR1_OC1M_Pos) | // PWM
+	TIM14->CCMR1 = (0x7UL << TIM_CCMR1_OC1M_Pos) | // PWM 0->1
 	               (0x0UL << TIM_CCMR1_CC1S_Pos) ; // CC1 is output
 	TIM14->CCER =  TIM_CCER_CC1E; // OC1 active
 	//
